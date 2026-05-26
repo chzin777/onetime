@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 
 const ANIM_MS = 280;
 
-export type DrawerState<T> = {
+export type SheetState<T> = {
   item: T | null;
   open: boolean;
   openWith: (item: T) => void;
   close: () => void;
 };
 
-export function useDrawerState<T>(): DrawerState<T> {
+export function useSheetState<T>(): SheetState<T> {
   const [item, setItem] = useState<T | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export function useDrawerState<T>(): DrawerState<T> {
   return { item, open, openWith, close };
 }
 
-export default function Drawer({
+export default function BottomSheet({
   open,
   title,
   subtitle,
@@ -42,7 +42,7 @@ export default function Drawer({
   subtitle?: string;
   onClose: () => void;
   children: React.ReactNode;
-  footer: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
   const [visible, setVisible] = useState(false);
 
@@ -76,7 +76,7 @@ export default function Drawer({
       <aside
         className={`
           w-full sm:max-w-xl bg-white shadow-2xl flex flex-col overflow-hidden ease-out
-          rounded-t-3xl sm:rounded-t-none sm:h-full
+          rounded-t-3xl sm:rounded-t-none sm:rounded-l-2xl sm:h-full
           max-h-[92vh] sm:max-h-none
           transition-transform
           ${visible ? "translate-y-0 sm:translate-x-0" : "translate-y-full sm:translate-y-0 sm:translate-x-full"}
@@ -88,7 +88,7 @@ export default function Drawer({
         </div>
         <div className="px-5 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between sticky top-0 bg-white z-10">
           <div className="min-w-0">
-            <h2 className="font-bold truncate text-base sm:text-base">{title}</h2>
+            <h2 className="font-bold truncate text-base">{title}</h2>
             {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
           </div>
           <button
@@ -102,9 +102,11 @@ export default function Drawer({
 
         <div className="flex-1 overflow-y-auto scrollbar-thin overscroll-contain">{children}</div>
 
-        <div className="px-5 sm:px-6 py-3 sm:py-4 border-t bg-slate-50 flex items-center justify-end gap-2 pb-safe">
-          {footer}
-        </div>
+        {footer && (
+          <div className="px-5 sm:px-6 py-3 sm:py-4 border-t bg-white flex items-center justify-end gap-2 pb-safe">
+            {footer}
+          </div>
+        )}
       </aside>
     </div>
   );

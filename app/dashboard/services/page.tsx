@@ -10,9 +10,11 @@ import {
   Trash2,
   Scissors,
   Save,
+  Wallet,
+  Users as UsersIcon,
 } from "lucide-react";
 import { useData } from "@/lib/store";
-import { formatBRL, type Service } from "@/lib/mock-data";
+import { formatBRL, computeDeposit, type Service } from "@/lib/mock-data";
 import Drawer, { useDrawerState } from "../_components/drawer";
 
 const blankSvc: Omit<Service, "id"> = {
@@ -22,6 +24,10 @@ const blankSvc: Omit<Service, "id"> = {
   durationMin: 30,
   price: 0,
   category: "Geral",
+  depositRequired: false,
+  depositMode: "percent",
+  depositValue: 0,
+  capacity: 1,
 };
 
 export default function ServicesPage() {
@@ -110,10 +116,22 @@ export default function ServicesPage() {
                       {formatBRL(s.price)}
                     </div>
                   </div>
-                  <div className="mt-2 flex items-center gap-1 text-[10px] text-slate-500">
-                    <Tag className="w-3 h-3" />
-                    {s.category}
+                  <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+                    <span className="inline-flex items-center gap-1">
+                      <Tag className="w-3 h-3" />
+                      {s.category}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <UsersIcon className="w-3 h-3" />
+                      {s.capacity}x simult.
+                    </span>
                   </div>
+                  {s.depositRequired && (
+                    <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full bg-amber-50 text-amber-700">
+                      <Wallet className="w-3 h-3" />
+                      Sinal {formatBRL(computeDeposit(s))}
+                    </div>
+                  )}
                 </div>
               ))}
               <button
@@ -272,6 +290,75 @@ function ServiceDrawer({
               className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-indigo-500 text-sm"
             />
           </div>
+        </div>
+
+        <div className="border-t pt-5">
+          <h4 className="text-sm font-semibold flex items-center gap-2 mb-3">
+            <UsersIcon className="w-4 h-4 text-indigo-600" />
+            Capacidade simultânea
+          </h4>
+          <div>
+            <label className="text-xs font-medium text-slate-600">Quantos clientes podem ser atendidos ao mesmo tempo</label>
+            <input
+              type="number"
+              min={1}
+              max={20}
+              value={form.capacity}
+              onChange={(e) => setForm({ ...form, capacity: Math.max(1, Number(e.target.value)) })}
+              className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-indigo-500 text-sm"
+            />
+            <p className="text-[10px] text-slate-500 mt-1">
+              Ex: 2 cadeiras de barbeiro = 2. Útil quando vários profissionais executam o serviço em paralelo.
+            </p>
+          </div>
+        </div>
+
+        <div className="border-t pt-5">
+          <h4 className="text-sm font-semibold flex items-center gap-2 mb-3">
+            <Wallet className="w-4 h-4 text-amber-600" />
+            Pré-pagamento / Sinal Pix
+          </h4>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm">Exigir sinal para confirmar</span>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, depositRequired: !form.depositRequired })}
+              className={`relative w-11 h-6 rounded-full transition ${form.depositRequired ? "bg-amber-500" : "bg-slate-300"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition ${form.depositRequired ? "translate-x-5" : ""}`} />
+            </button>
+          </div>
+          {form.depositRequired && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-medium text-slate-600">Modo</label>
+                <select
+                  value={form.depositMode}
+                  onChange={(e) => setForm({ ...form, depositMode: e.target.value as "fixed" | "percent" })}
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                >
+                  <option value="percent">% do preço</option>
+                  <option value="fixed">Valor fixo (R$)</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-600">
+                  Valor {form.depositMode === "percent" ? "(%)" : "(R$)"}
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step={form.depositMode === "percent" ? 5 : 0.5}
+                  value={form.depositValue}
+                  onChange={(e) => setForm({ ...form, depositValue: Number(e.target.value) })}
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                />
+              </div>
+              <div className="col-span-2 text-xs text-amber-700 bg-amber-50 rounded-lg p-3">
+                Sinal calculado: <strong>{formatBRL(computeDeposit({ ...form, id: "preview" } as Service))}</strong>. Cliente recebe Pix copia-cola no checkout. Sem pagamento em 30min, agendamento expira.
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Drawer>

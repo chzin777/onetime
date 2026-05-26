@@ -23,6 +23,7 @@ import SplitText from "./_components/split-text";
 import NavLink from "./_components/nav-link";
 import TextType from "./_components/text-type";
 import Logo, { LogoMark } from "./_components/logo";
+import TiltedCard from "./_components/tilted-card";
 
 export default function LandingPage() {
   return (
@@ -124,8 +125,8 @@ export default function LandingPage() {
             <div className="absolute -inset-4 bg-gradient-to-tr from-indigo-500 to-violet-500 rounded-3xl blur-2xl opacity-20" />
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white">
               <Image
-                src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&h=700&fit=crop"
-                alt="Painel de agendamentos"
+                src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=900&h=700&fit=crop"
+                alt="Atendimento profissional"
                 width={900}
                 height={700}
                 className="w-full h-auto"
@@ -360,16 +361,21 @@ export default function LandingPage() {
                 ],
               },
             ].map((p) => (
-              <div
+              <TiltedCard
                 key={p.name}
-                className={`relative p-7 rounded-2xl border transition flex flex-col ${
+                rotateAmplitude={p.highlight ? 10 : 8}
+                scaleOnHover={p.highlight ? 1.04 : 1.03}
+                className={p.highlight ? "md:scale-105" : ""}
+              >
+              <div
+                className={`relative p-7 rounded-2xl border flex flex-col h-full ${
                   p.highlight
-                    ? "border-indigo-500 shadow-2xl shadow-indigo-500/20 md:scale-105 bg-gradient-to-br from-white to-indigo-50"
-                    : "border-slate-200 hover:border-slate-300 bg-white"
+                    ? "border-indigo-500 shadow-2xl shadow-indigo-500/20 bg-gradient-to-br from-white to-indigo-50"
+                    : "border-slate-200 bg-white"
                 }`}
               >
                 {p.highlight && p.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-bold tracking-wide">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-bold tracking-wide z-10">
                     {p.badge}
                   </div>
                 )}
@@ -422,6 +428,7 @@ export default function LandingPage() {
                   ))}
                 </div>
               </div>
+              </TiltedCard>
             ))}
           </div>
 

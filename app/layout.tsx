@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { DataProvider } from "@/lib/store";
+import { ToastProvider } from "./_components/toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,6 +18,22 @@ export const metadata: Metadata = {
   title: "OneTime — Agendamento online para o seu negócio",
   description:
     "Plataforma SaaS de agendamento online para petshops, barbearias, salões de beleza e prestadores de serviço.",
+  manifest: "/manifest.webmanifest",
+  applicationName: "OneTime",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "OneTime",
+  },
+  formatDetection: { telephone: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#6366f1",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -29,8 +46,10 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
-        <DataProvider>{children}</DataProvider>
+      <body className="min-h-full flex flex-col bg-background text-foreground overscroll-y-none">
+        <DataProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </DataProvider>
       </body>
     </html>
   );
