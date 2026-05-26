@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { DataProvider } from "@/lib/store";
 import { ToastProvider } from "./_components/toast";
+import { GyroProvider } from "./_components/gyro-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +49,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground overscroll-y-none">
         <DataProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <GyroProvider>{children}</GyroProvider>
+          </ToastProvider>
         </DataProvider>
       </body>
     </html>

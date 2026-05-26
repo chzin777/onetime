@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
+import { useGyro } from "./gyro-provider";
 
 type Props = {
   children: React.ReactNode;
@@ -9,8 +10,6 @@ type Props = {
   className?: string;
   glare?: boolean;
 };
-
-type IOSRequestPerm = { requestPermission?: () => Promise<"granted" | "denied"> };
 
 export default function TiltedCard({
   children,
@@ -27,8 +26,7 @@ export default function TiltedCard({
   const currentRef = useRef({ rx: 0, ry: 0, scale: 1, gx: 50, gy: 50 });
   const interactingRef = useRef(false);
 
-  const [needsPermission, setNeedsPermission] = useState(false);
-  const [gyroActive, setGyroActive] = useState(false);
+  const { enabled: gyroEnabled } = useGyro();
 
   const animate = useCallback(() => {
     const t = targetRef.current;
@@ -74,7 +72,7 @@ export default function TiltedCard({
 
   function handlePointerLeave() {
     interactingRef.current = false;
-    if (!gyroActive) {
+    if (!gyroEnabled) {
       targetRef.current.rx = 0;
       targetRef.current.ry = 0;
       targetRef.current.scale = 1;
@@ -100,40 +98,11 @@ export default function TiltedCard({
     [rotateAmplitude]
   );
 
-  const enableGyro = useCallback(async () => {
-    const DOE = (typeof window !== "undefined" ? (window.DeviceOrientationEvent as unknown as IOSRequestPerm) : null);
-    if (DOE && typeof DOE.requestPermission === "function") {
-      try {
-        const res = await DOE.requestPermission();
-        if (res !== "granted") return false;
-      } catch {
-        return false;
-      }
-    }
-    window.addEventListener("deviceorientation", handleOrientation);
-    setGyroActive(true);
-    setNeedsPermission(false);
-    return true;
-  }, [handleOrientation]);
-
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const isTouch = window.matchMedia("(pointer: coarse)").matches;
-    if (!isTouch) return;
-
-    const DOE = window.DeviceOrientationEvent as unknown as IOSRequestPerm;
-    const needsPerm = !!(DOE && typeof DOE.requestPermission === "function");
-    if (needsPerm) {
-      setNeedsPermission(true);
-    } else if (typeof window.DeviceOrientationEvent !== "undefined") {
-      window.addEventListener("deviceorientation", handleOrientation);
-      setGyroActive(true);
-    }
-
-    return () => {
-      window.removeEventListener("deviceorientation", handleOrientation);
-    };
-  }, [handleOrientation]);
+    if (!gyroEnabled || typeof window === "undefined") return;
+    window.addEventListener("deviceorientation", handleOrientation);
+    return () => window.removeEventListener("deviceorientation", handleOrientation);
+  }, [gyroEnabled, handleOrientation]);
 
   return (
     <div
@@ -157,16 +126,6 @@ export default function TiltedCard({
           />
         )}
       </div>
-
-      {needsPermission && (
-        <button
-          type="button"
-          onClick={enableGyro}
-          className="absolute top-2 right-2 z-20 text-[10px] font-semibold px-2 py-1 rounded-full bg-black/70 text-white backdrop-blur"
-        >
-          Ativar 3D
-        </button>
-      )}
     </div>
   );
 }
