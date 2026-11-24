@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OneTime — Agendamento online para o seu negócio
 
-## Getting Started
+Plataforma de agendamento para negócios de serviço (salões, barbearias, clínicas): o cliente agenda por um link público e o dono gerencia tudo em um painel — profissionais, serviços, horários, bloqueios, lista de espera, fidelidade e indicações.
 
-First, run the development server:
+**Produção (demo):** https://onetime-six.vercel.app
+
+> **Status:** protótipo funcional sem backend. Os dados iniciais vêm de `lib/mock-data.ts` e as alterações ficam salvas no `localStorage` do navegador.
+
+## Stack
+
+- [Next.js 16](https://nextjs.org) (App Router) + React 19 + TypeScript
+- Tailwind CSS 4
+- GSAP (animações) e ícones `lucide-react`
+- PWA (`app/manifest.webmanifest`)
+
+## Como rodar
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build
+npm run start
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Rotas
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Rota | Descrição |
+|------|-----------|
+| `/` | Landing page do produto |
+| `/login` | Acesso ao painel |
+| `/b/[slug]` | Página pública de agendamento do estabelecimento |
+| `/dashboard` | Visão geral do dia |
+| `/dashboard/appointments` | Agendamentos |
+| `/dashboard/professionals` | Profissionais |
+| `/dashboard/services` | Serviços e preços |
+| `/dashboard/hours` | Horários de funcionamento |
+| `/dashboard/blocks` | Bloqueios de agenda |
+| `/dashboard/waitlist` | Lista de espera |
+| `/dashboard/loyalty` | Programa de fidelidade |
+| `/dashboard/referrals` | Programa de indicação |
+| `/dashboard/whatsapp` | Mensagens via WhatsApp |
+| `/dashboard/establishments` | Estabelecimentos |
+| `/dashboard/settings` | Configurações |
+| `/termos`, `/privacidade` | Páginas legais |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Estrutura
 
-## Learn More
+```
+app/                 rotas (landing, login, agendamento público, dashboard)
+app/_components/     componentes compartilhados
+lib/mock-data.ts     dados de exemplo (estabelecimentos, serviços, clientes...)
+lib/store.tsx        estado global (React Context + localStorage)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Vercel — cada push na `main` publica automaticamente.
